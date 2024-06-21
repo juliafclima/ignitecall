@@ -18,6 +18,7 @@ export const FormHeader = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: '$4',
+
   paddingBottom: '$6',
   marginBottom: '$2',
   borderBottom: '1px solid $gray600',
