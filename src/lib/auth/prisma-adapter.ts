@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Adapter } from "next-auth/adapters";
 import { destroyCookie, parseCookies } from "nookies";
+
 import { prisma } from "../prisma";
 
 export function PrismaAdapter(
