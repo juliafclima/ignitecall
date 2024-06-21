@@ -11,9 +11,12 @@ import { ArrowRight } from "phosphor-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { convertTimeStringToMinutes } from "../../../utils/convert-time-string-to-minutes";
 import { getWeekDays } from "../../../utils/get-week-days";
-import { Container, FormError, Header } from "../styles";
+import { Container, Header } from "../styles";
+import { api } from "../../../lib/axios";
 import {
+  FormError,
   IntervalBox,
   IntervalContainer,
   IntervalDay,
@@ -35,10 +38,30 @@ const timeIntervalsFormSchema = z.object({
     .transform((intervals) => intervals.filter((interval) => interval.enabled))
     .refine((intervals) => intervals.length > 0, {
       message: "Você precisa selecionar pelo menos um dia da semana",
-    }),
+    })
+    .transform((intervals) => {
+      return intervals.map((interval) => {
+        return {
+          weekDay: interval.weekDay,
+          startTimeInMinutes: convertTimeStringToMinutes(interval.startTime),
+          endTimeInMinutes: convertTimeStringToMinutes(interval.endTime),
+        };
+      });
+    })
+    .refine(
+      (intervals) => {
+        return intervals.every(
+          (interval) => interval.endTimeInMinutes >= interval.startTimeInMinutes
+        );
+      },
+      {
+        message: "O horário de término deve ser após o horário de início",
+      }
+    ),
 });
 
-type TimeIntervalsFormData = z.infer<typeof timeIntervalsFormSchema>;
+type TimeIntervalsFormInput = z.input<typeof timeIntervalsFormSchema>;
+type TimeIntervalsFormOutput = z.output<typeof timeIntervalsFormSchema>;
 
 export default function TimeIntervals() {
   const {
@@ -47,52 +70,17 @@ export default function TimeIntervals() {
     control,
     watch,
     formState: { isSubmitting, errors },
-  } = useForm({
+  } = useForm<TimeIntervalsFormInput>({
     resolver: zodResolver(timeIntervalsFormSchema),
     defaultValues: {
       intervals: [
-        {
-          weekDay: 0,
-          enabled: false,
-          startTime: "08:00",
-          endTime: "18:00",
-        },
-        {
-          weekDay: 1,
-          enabled: true,
-          startTime: "08:00",
-          endTime: "18:00",
-        },
-        {
-          weekDay: 2,
-          enabled: true,
-          startTime: "08:00",
-          endTime: "18:00",
-        },
-        {
-          weekDay: 3,
-          enabled: true,
-          startTime: "08:00",
-          endTime: "18:00",
-        },
-        {
-          weekDay: 4,
-          enabled: true,
-          startTime: "08:00",
-          endTime: "18:00",
-        },
-        {
-          weekDay: 5,
-          enabled: true,
-          startTime: "08:00",
-          endTime: "18:00",
-        },
-        {
-          weekDay: 6,
-          enabled: false,
-          startTime: "08:00",
-          endTime: "18:00",
-        },
+        { weekDay: 0, enabled: false, startTime: "00:00", endTime: "23:59" },
+        { weekDay: 1, enabled: true, startTime: "00:00", endTime: "23:59" },
+        { weekDay: 2, enabled: true, startTime: "00:00", endTime: "23:59" },
+        { weekDay: 3, enabled: true, startTime: "00:00", endTime: "23:59" },
+        { weekDay: 4, enabled: true, startTime: "00:00", endTime: "23:59" },
+        { weekDay: 5, enabled: true, startTime: "00:00", endTime: "23:59" },
+        { weekDay: 6, enabled: false, startTime: "00:00", endTime: "23:59" },
       ],
     },
   });
@@ -106,8 +94,12 @@ export default function TimeIntervals() {
 
   const intervals = watch("intervals");
 
-  async function handleSetTimeIntervals(data: TimeIntervalsFormData) {
-    console.log(data);
+  async function handleSetTimeIntervals(data: any) {
+    const { intervals } = data as TimeIntervalsFormOutput;
+
+    await api.post("/users/time-intervals", {
+      intervals,
+    });
   }
 
   return (
@@ -144,17 +136,18 @@ export default function TimeIntervals() {
                   />
                   <Text>{weekDays[field.weekDay]}</Text>
                 </IntervalDay>
-
                 <IntervalInputs>
                   <TextInput
                     size="sm"
                     type="time"
+                    step={60}
                     disabled={intervals[index].enabled === false}
                     {...register(`intervals.${index}.startTime`)}
                   />
                   <TextInput
                     size="sm"
                     type="time"
+                    step={60}
                     disabled={intervals[index].enabled === false}
                     {...register(`intervals.${index}.endTime`)}
                   />
