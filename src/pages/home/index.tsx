@@ -1,9 +1,9 @@
-import { Heading, Text } from "@ignite-ui/react";
-import Image from "next/image";
+import { Heading, Text } from '@ignite-ui/react'
+import Image from 'next/image'
+import { Container, Hero, Preview } from './styles'
 
-import { Container, Hero, Preview } from "./styles";
-import previewImage from "../../assets/app-preview.png";
-import { ClaimUsernameForm } from "./components/ClaimUsernameForm";
+import previewImage from '../../assets/app-preview.png'
+import { ClaimUsernameForm } from './components/ClaimUsernameForm'
 
 export default function Home() {
   return (
@@ -30,5 +30,5 @@ export default function Home() {
         />
       </Preview>
     </Container>
-  );
+  )
 }
