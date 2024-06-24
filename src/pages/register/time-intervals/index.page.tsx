@@ -7,11 +7,10 @@ import {
   Text,
   TextInput,
 } from '@ignite-ui/react'
+import { useRouter } from 'next/router'
 import { ArrowRight } from 'phosphor-react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useRouter } from "next/router";
-
 import { api } from '../../../lib/axios'
 import { convertTimeStringToMinutes } from '../../../utils/convert-time-string-to-minutes'
 import { getWeekDays } from '../../../utils/get-week-days'
@@ -89,7 +88,7 @@ export default function TimeIntervals() {
     },
   })
 
-  const router = useRouter();
+  const router = useRouter()
 
   const weekDays = getWeekDays()
 
@@ -107,7 +106,7 @@ export default function TimeIntervals() {
       intervals,
     })
 
-     await router.push("/register/update-profile");
+    await router.push('/register/update-profile')
   }
 
   return (
