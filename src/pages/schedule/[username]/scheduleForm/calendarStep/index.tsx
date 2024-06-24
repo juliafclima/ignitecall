@@ -6,12 +6,12 @@ import {
   TimePickerList,
 } from "./styles";
 
-import { useQuery } from "@tanstack/react-query";
-import dayjs from "dayjs";
-import { useRouter } from "next/router";
-import { useState } from "react";
 import { Calendar } from "../../../../../components/Calendar";
 import { api } from "../../../../../lib/axios";
+import dayjs from "dayjs";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 interface Availability {
   possibleTimes: number[];
@@ -45,6 +45,7 @@ export function CalendarStep({ onSelectDateTime }: CalendarStepProps) {
       const response = await api.get(`/users/${username}/availability`, {
         params: {
           date: selectedDateWithoutTime,
+          timezoneOffset: selectedDate ? selectedDate.getTimezoneOffset() : 0,
         },
       });
 
