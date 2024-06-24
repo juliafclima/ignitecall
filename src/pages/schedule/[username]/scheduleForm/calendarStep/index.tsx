@@ -1,54 +1,55 @@
-import { useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { Calendar } from '../../../../../components/Calendar'
-import { api } from '../../../../../lib/axios'
 import {
   Container,
   TimePicker,
   TimePickerHeader,
   TimePickerItem,
   TimePickerList,
-} from './styles'
+} from "./styles";
+
+import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { Calendar } from "../../../../../components/Calendar";
+import { api } from "../../../../../lib/axios";
 
 interface Availability {
-  possibleTimes: number[]
-  availableTimes: number[]
+  possibleTimes: number[];
+  availableTimes: number[];
 }
 
 export function CalendarStep() {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const router = useRouter()
+  const router = useRouter();
 
-  const isDateSelected = !!selectedDate
-  const username = String(router.query.username)
+  const isDateSelected = !!selectedDate;
+  const username = String(router.query.username);
 
-  const weekDay = selectedDate ? dayjs(selectedDate).format('dddd') : null
+  const weekDay = selectedDate ? dayjs(selectedDate).format("dddd") : null;
   const describedDate = selectedDate
-    ? dayjs(selectedDate).format('DD[ de ]MMMM')
-    : null
+    ? dayjs(selectedDate).format("DD[ de ]MMMM")
+    : null;
 
   const selectedDateWithoutTime = selectedDate
-    ? dayjs(selectedDate).format('YYYY-MM-DD')
-    : null
+    ? dayjs(selectedDate).format("YYYY-MM-DD")
+    : null;
 
   const { data: availability } = useQuery<Availability>(
-    ['availability', selectedDateWithoutTime],
+    ["availability", selectedDateWithoutTime],
     async () => {
       const response = await api.get(`/users/${username}/availability`, {
         params: {
           date: selectedDateWithoutTime,
         },
-      })
+      });
 
-      return response.data
+      return response.data;
     },
     {
       enabled: !!selectedDate,
-    },
-  )
+    }
+  );
 
   return (
     <Container isTimePickerOpen={isDateSelected}>
@@ -67,13 +68,13 @@ export function CalendarStep() {
                   key={hour}
                   disabled={!availability.availableTimes.includes(hour)}
                 >
-                  {String(hour).padStart(2, '0')}:00h
+                  {String(hour).padStart(2, "0")}:00h
                 </TimePickerItem>
-              )
+              );
             })}
           </TimePickerList>
         </TimePicker>
       )}
     </Container>
-  )
+  );
 }
