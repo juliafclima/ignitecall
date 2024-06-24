@@ -42,6 +42,7 @@ export async function getGoogleOAuthToken(userId: string) {
       where: {
         id: account.id,
       },
+
       data: {
         access_token,
         expires_at: expiry_date ? Math.floor(expiry_date / 1000) : null,
